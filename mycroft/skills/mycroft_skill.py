@@ -14,20 +14,21 @@
 #
 """ Collection of functions relating to the implementation of mycroft skills.
 """
-import sys
-import re
-import traceback
-import inspect
-from inspect import ismethod, signature
 import collections
+import csv
+import inspect
+import re
+import sys
+import traceback
 import time
 from datetime import datetime, timedelta
-import csv
+from inspect import ismethod, signature
 from itertools import chain
-from adapt.intent import Intent, IntentBuilder
 from os import walk
 from os.path import join, abspath, dirname, basename, exists
 from threading import Event, Timer
+
+from adapt.intent import Intent, IntentBuilder
 
 from mycroft import dialog
 from mycroft.api import DeviceApi
@@ -39,13 +40,21 @@ from mycroft.dialog import DialogLoader
 from mycroft.filesystem import FileSystemAccess
 from mycroft.messagebus.message import Message
 from mycroft.metrics import report_metric, report_timing, Stopwatch
-from mycroft.util import (camel_case_split,
-                          resolve_resource_file,
-                          play_audio_file)
+from mycroft.util import (
+    camel_case_split,
+    resolve_resource_file,
+    play_audio_file
+)
 from mycroft.util.log import LOG
 from .settings import SkillSettings
-from .skill_data import (load_vocabulary, load_regex, to_alnum,
-                         munge_regex, munge_intent_parser, read_vocab_file)
+from .skill_data import (
+    load_vocabulary,
+    load_regex,
+    to_alnum,
+    munge_regex,
+    munge_intent_parser,
+    read_vocab_file
+)
 
 
 def simple_trace(stack_trace):
