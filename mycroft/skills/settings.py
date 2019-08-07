@@ -27,13 +27,14 @@
     describe the interface you want to edit that value with:
         ...
         "fields": [
-               {
-                   "name": "username",
-                   "type": "email",
-                   "label": "Email address to associate",
-                   "placeholder": "example@mail.com",
-                   "value": ""
-               }]
+            {
+                "name": "username",
+                "type": "email",
+                "label": "Email address to associate",
+                "placeholder": "example@mail.com",
+                "value": ""
+            }
+        ]
         ...
     When the user changes the setting via the web UI, it will be sent
     down to all the devices and automatically placed into the
@@ -58,9 +59,8 @@
         s['flower pot sayings'] = 'Not again...'
         s.store()  # This happens automagically in a MycroftSkill
 """
-
-import json
 import hashlib
+import json
 import os
 import re
 import time
@@ -68,12 +68,10 @@ from os.path import isfile, join
 from requests.exceptions import RequestException, HTTPError
 from threading import Timer, Thread
 
-from msm import SkillEntry
-
 from mycroft.api import DeviceApi, is_paired
+from mycroft.configuration import ConfigurationManager
 from mycroft.util.log import LOG
 from mycroft.util import camel_case_split
-from mycroft.configuration import ConfigurationManager
 from .msm_wrapper import build_msm_config, create_msm
 
 
