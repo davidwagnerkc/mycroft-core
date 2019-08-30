@@ -32,6 +32,10 @@ loop = None
 config = None
 
 
+def handle_wake_word_recognized():
+    LOG.info("Wake word recognized!")
+    bus.emit(Message('recognizer_loop:wake_word_recognized'))
+
 def handle_record_begin():
     LOG.info("Begin Recording...")
     bus.emit(Message('recognizer_loop:record_begin'))
@@ -162,6 +166,7 @@ def main():
     loop.on('recognizer_loop:wakeword', handle_wakeword)
     loop.on('recognizer_loop:record_end', handle_record_end)
     loop.on('recognizer_loop:no_internet', handle_no_internet)
+    loop.on('recognizer_loop:wake_word_recognized', handle_wake_word_recognized)
 
     # Register handlers for events on main Mycroft messagebus
     bus.on('open', handle_open)

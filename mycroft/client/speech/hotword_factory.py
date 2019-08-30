@@ -142,6 +142,7 @@ class PreciseHotword(HotWordEngine):
             Configuration.updated(None)
 
         self.download_complete = True
+        self.emitter = None
 
         self.show_download_progress = Timer(0, lambda: None)
         precise_config = Configuration.get()['precise']
@@ -160,6 +161,8 @@ class PreciseHotword(HotWordEngine):
         self.stream = ReadWriteStream()
 
         def on_activation():
+            LOG.info('WAGNER PreciseHotword')
+            self.emitter.emit("recognizer_loop:wake_word_recognized")
             self.has_found = True
 
         trigger_level = self.config.get('trigger_level', 3)

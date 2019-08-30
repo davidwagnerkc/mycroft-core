@@ -388,7 +388,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
             }
         )
 
-    def _wait_until_wake_word(self, source, sec_per_buffer):
+    def _wait_until_wake_word(self, source, sec_per_buffer, emitter):
         """Listen continuously on source until a wake word is spoken
 
         Args:
@@ -476,6 +476,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
 
                 # Save positive wake words as appropriate
                 if said_wake_word:
+                    LOG.info('WAGNER ww rec')
                     audio = None
                     mtd = None
                     if self.save_wake_words:
@@ -540,11 +541,12 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         self.adjust_for_ambient_noise(source, 1.0)
 
         LOG.debug("Waiting for wake word...")
-        self._wait_until_wake_word(source, sec_per_buffer)
+        self._wait_until_wake_word(source, sec_per_buffer, emitter)
         if self._stop_signaled:
             return
 
         LOG.debug("Recording...")
+        LOG.info('WAGNER ww rec')
         emitter.emit("recognizer_loop:record_begin")
 
         # If enabled, play a wave file with a short sound to audibly

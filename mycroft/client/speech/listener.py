@@ -291,6 +291,7 @@ class RecognizerLoop(EventEmitter):
                                             mute=self.mute_calls > 0)
 
         self.wakeword_recognizer = self.create_wake_word_recognizer()
+        self.wakeword_recognizer.emitter = self
         # TODO - localization
         self.wakeup_recognizer = self.create_wakeup_recognizer()
         self.responsive_recognizer = ResponsiveRecognizer(
