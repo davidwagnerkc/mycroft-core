@@ -222,7 +222,7 @@ class SkillSettings(dict):
         self._api_path = "/" + self._device_identity + "/skill"
         try:
             self._user_identity = self.api.get()['user']['uuid']
-        except RequestException:
+        except (RequestException, TypeError):
             return
 
         settings = self._request_my_settings(self.skill_gid)
@@ -529,7 +529,7 @@ class SkillSettings(dict):
         """
         try:
             settings = self.api.get_skill_settings()
-        except RequestException:
+        except (RequestException, TypeError):
             return None
 
         settings = [skills for skills in settings if skills is not None]
