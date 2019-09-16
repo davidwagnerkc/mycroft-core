@@ -517,7 +517,7 @@ def check_remote_pairing(ignore_errors):
         True if pairing checks out, otherwise False.
     """
     try:
-        DeviceApi().get()
+        DeviceApi().get()['user']['uuid']
         return True
     except HTTPError as e:
         if e.response.status_code == 401:
