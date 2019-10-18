@@ -101,6 +101,14 @@ def handle_mic_mute(event):
     """Mute the listener system."""
     loop.mute()
 
+def handle_reload():
+    LOG.info('WAGNER reload handle')
+    loop.reload()
+
+def handle_break_shit(event):
+    """Boom."""
+    loop.boom()
+
 
 def handle_mic_unmute(event):
     """Unmute the listener system."""
@@ -175,6 +183,9 @@ def main():
     loop.on('recognizer_loop:wakeword', handle_wakeword)
     loop.on('recognizer_loop:record_end', handle_record_end)
     loop.on('recognizer_loop:no_internet', handle_no_internet)
+    loop.on('recognizer_loop:reload', handle_reload)
+    bus.on('recognizer_loop:reload', handle_reload)
+    bus.on('kaboooom', handle_break_shit)
 
     # Register handlers for events on main Mycroft messagebus
     bus.on('open', handle_open)

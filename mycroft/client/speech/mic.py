@@ -107,7 +107,10 @@ class MutableStream:
         self.wrapped_stream = None
 
     def is_stopped(self):
-        return self.wrapped_stream.is_stopped()
+        try:
+            return self.wrapped_stream.is_stopped()
+        except Exception:
+            return True
 
     def stop_stream(self):
         return self.wrapped_stream.stop_stream()
@@ -124,23 +127,43 @@ class MutableMicrophone(Microphone):
             self.mute()
 
     def __enter__(self):
-        assert self.stream is None, \
-            "This audio source is already inside a context manager"
-        self.audio = pyaudio.PyAudio()
-        self.stream = MutableStream(self.audio.open(
-            input_device_index=self.device_index, channels=1,
-            format=self.format, rate=self.SAMPLE_RATE,
-            frames_per_buffer=self.CHUNK,
-            input=True,  # stream is an input stream
-        ), self.format, self.muted)
-        return self
+        return self._start()
+
+    def _start(self):
+        try:
+            LOG.info('WAGNER ENTER')
+            assert self.stream is None, \
+                "This audio source is already inside a context manager"
+            self.audio = pyaudio.PyAudio()
+            self.stream = MutableStream(self.audio.open(
+                input_device_index=self.device_index, channels=1,
+                format=self.format, rate=self.SAMPLE_RATE,
+                frames_per_buffer=self.CHUNK,
+                input=True,  # stream is an input stream
+            ), self.format, self.muted)
+            return self
+        except Exception:
+            LOG.exception('WAGNER EXIT EXC')
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if not self.stream.is_stopped():
-            self.stream.stop_stream()
-        self.stream.close()
+        return self._stop()
+
+    def _stop(self):
+        LOG.info('WAGNER EXIT')
+        try:
+            if not self.stream.is_stopped():
+                self.stream.stop_stream()
+            self.stream.close()
+        except Exception:
+            LOG.exception('WAGNER EXIT EXC')
+            pass
+
         self.stream = None
         self.audio.terminate()
+
+    def restart(self):
+        self._stop()
+        self._start()
 
     def mute(self):
         self.muted = True

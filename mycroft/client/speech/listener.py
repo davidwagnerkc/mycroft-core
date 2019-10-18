@@ -68,9 +68,12 @@ class AudioProducer(Thread):
         self.recognizer = recognizer
         self.emitter = emitter
         self.stream_handler = stream_handler
+        self.ioerror_count = 0
 
     def run(self):
+        LOG.info('WAGNER RUN')
         with self.mic as source:
+            LOG.info('WAGNER ONE MORE')
             self.recognizer.adjust_for_ambient_noise(source)
             while self.state.running:
                 try:
@@ -85,7 +88,19 @@ class AudioProducer(Thread):
                     # If self.recognizer.overflow_exc is False (default)
                     # input buffer overflow IOErrors due to not consuming the
                     # buffers quickly enough will be silently ignored.
+
+                    # We want to see IOErrors in logs if they occur, but at
+                    # rate of a log every 3ms one hundred should suffice.
+                    self.ioerror_count += 1
+                    if self.ioerror_count > 100:
+                        continue
+                    #try:
+                    #    #self.emitter.emit('recognizer_loop:reload')
+                    #except Exception:
+                    #    LOG.exception('WAGNER')
                     LOG.exception('IOError Exception in AudioProducer')
+                    LOG.info('WAGNER RESTART')
+                    source.restart() 
                 except Exception:
                     LOG.exception('Exception in AudioProducer')
                     raise
@@ -97,6 +112,9 @@ class AudioProducer(Thread):
         """Stop producer thread."""
         self.state.running = False
         self.recognizer.stop()
+
+    def please_explode(self):
+        self.mic.stream.stop_stream()
 
 
 class AudioConsumer(Thread):
@@ -340,10 +358,14 @@ class RecognizerLoop(EventEmitter):
                                       self.wakeword_recognizer)
         self.consumer.start()
 
+    def boom(self):
+        self.producer.please_explode()
+
     def stop(self):
         self.state.running = False
         self.producer.stop()
         # wait for threads to shutdown
+        self.producer.should_abort_immediately = True
         self.producer.join()
         self.consumer.join()
 
@@ -400,6 +422,7 @@ class RecognizerLoop(EventEmitter):
 
     def reload(self):
         """Reload configuration and restart consumer and producer."""
+        LOG.info('WAGNER RELOAD HEY')
         self.stop()
         self.wakeword_recognizer.stop()
         # load config
